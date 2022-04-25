@@ -1,0 +1,7 @@
+[
+  {
+    "name": "sayHello",
+    "params" : [],
+    "returns" : "Hello!"
+  }
+]
