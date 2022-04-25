@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "gen/clientabstract.h"
+#include "gen/jsonrpcclient.h"
 #include <jsonrpccpp/client/connectors/httpclient.h>
 
 using namespace jsonrpc;
@@ -10,7 +10,7 @@ int main()
 {
 
 	HttpClient httpclient("http://localhost:8383");
-	ClientAbstract c(httpclient, JSONRPC_CLIENT_V2); // json-rpc 2.0
+	JSONRPCClient c(httpclient, JSONRPC_CLIENT_V2); // json-rpc 2.0
 
 	try {
 //		cout << c.sayHello("Peter Knafl") << endl;
@@ -32,7 +32,7 @@ int main()
 //		cout << "Compare: " << c.isEqual("Peter", "peter") << endl;
 //		cout << "Build object: " << c.buildObject("Peter", 1990) << endl;
 
-		c.sayHello();
+		c.sayHello(std::string("test with num"), 1337);
 
 	} catch (JsonRpcException &e) {
 		cerr << e.what() << endl;
