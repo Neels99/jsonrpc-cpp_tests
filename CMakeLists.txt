@@ -12,28 +12,55 @@ HunterGate(
 SET(HUNTER_STATUS_DEBUG ON)
 project(jsonrpc)
 
+include("gen/buildScript.cmake")
+#macro(jsonrpcstub_create EXECUTABLE SPEC SERVERNAME SERVERDIR SERVERFILENAME CLIENTNAME CLIENTDIR CLIENTFILENAME)
+#    if (ETH_JSON_RPC_STUB)
+#        add_custom_target(${SPEC}stub)
+#        add_custom_command(
+#                TARGET ${SPEC}stub
+#                POST_BUILD
+#                DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${SPEC}"
+#                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+#                COMMAND ${CMAKE_COMMAND} -DETH_SPEC_PATH="${CMAKE_CURRENT_SOURCE_DIR}/${SPEC}" -DETH_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -DETH_CMAKE_DIR="${ETH_CMAKE_DIR}"
+#                -DETH_CLIENT_DIR="${CLIENTDIR}"
+#                -DETH_CLIENT_NAME=${CLIENTNAME}
+#                -DETH_CLIENT_FILENAME=${CLIENTFILENAME}
+#                -DETH_SERVER_DIR="${SERVERDIR}"
+#                -DETH_SERVER_NAME=${SERVERNAME}
+#                -DETH_SERVER_FILENAME=${SERVERFILENAME}
+#                -DETH_JSON_RPC_STUB="${ETH_JSON_RPC_STUB}"
+#                -P "${ETH_SCRIPTS_DIR}/jsonrpcstub.cmake"
+#        )
+#        add_dependencies(${EXECUTABLE} ${SPEC}stub)
+#    endif ()
+#endmacro()
+
+#jsonrpcstub_create(
+#        EthClient spec.json EthClient
+#)
 
 # Generate spec
-#file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/gen)
+#file(MAKE_DIRECTORY gen)
 #
 #message("${CMAKE_CURRENT_SOURCE_DIR}/gen/serverabstract.h")
 #add_custom_command(
-#        OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/gen/serverabstract.h
+#        OUTPUT gen/serverabstract.h
 #        COMMAND jsonrpcstub ARGS ${CMAKE_CURRENT_SOURCE_DIR}/spec.json --cpp-server=ServerAbstract --cpp-server-file=gen/serverabstract.h
 #        MAIN_DEPENDENCY spec.json
 #        DEPENDS jsonrpcstub
 #        COMMENT "Generating Server Stubfiles"
 #        VERBATIM
 #)
-#
+
 #add_custom_command(
-#        OUTPUT ${CMAKE_BINARY_DIR}/gen/clientabstract.h
-#        COMMAND jsonrpcstub ARGS ${CMAKE_CURRENT_SOURCE_DIR}/spec.json --cpp-client=ClientAbstract --cpp-client-file=${CMAKE_BINARY_DIR}/gen/clientabstract.h
+#        OUTPUT gen/clientabstract.h
+#        COMMAND jsonrpcstub ARGS ${CMAKE_CURRENT_SOURCE_DIR}/spec.json --cpp-client=ClientAbstract --cpp-client-file=gen/clientabstract.h
 #        MAIN_DEPENDENCY spec.json
 #        DEPENDS jsonrpcstub
 #        COMMENT "Generating Server Stubfiles"
 #        VERBATIM
 #)
+include_directories(${CMAKE_BINARY_DIR})
 
 #############
 #
@@ -53,6 +80,10 @@ project(jsonrpc)
 #        jsonrpccpp
 #)
 
+add_custom_target(common_stubs
+        DEPENDS gen/abstractstubserver.h gen/stubclient.h
+        )
+
 hunter_add_package(jsoncpp)
 find_package(jsoncpp CONFIG REQUIRED)
 
@@ -64,9 +95,9 @@ find_package(libjson-rpc-cpp CONFIG REQUIRED)
 
 # Executables
 set(abs gen/clientabstract.h gen/serverabstract.h)
-add_custom_target(common_stubs
-        DEPENDS ${CMAKE_BINARY_DIR}/gen/abstractstubserver.h ${CMAKE_BINARY_DIR}/gen/stubclient.h
-        )
+#add_custom_target(common_stubs
+#        DEPENDS ${CMAKE_BINARY_DIR}/gen/abstractstubserver.h ${CMAKE_BINARY_DIR}/gen/stubclient.h
+#        )
 add_executable(jsonrpc_client client.cpp ${abs})
 
 add_executable(jsonrpc_server server.cpp ${abs})

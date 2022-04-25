@@ -1,7 +1,7 @@
 [
   {
     "name": "sayHello",
-    "params" : [],
+    "params" : ["Hello!", 123],
     "returns" : "Hello!"
   }
 ]
